@@ -54,10 +54,17 @@
       .replace(/^# (.+)$/gm, '<h1>$1</h1>')
       .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
       .replace(/^\d+\.\s+(.+)$/gm, '<li class="ordered">$1</li>')
-      .replace(/^[-*]\s+(.+)$/gm, '<li>$1</li>')
+      .replace(/^[-*]\s+(.+)$/gm, '<li>$1</li>');
+
+    html = html.replace(/(<li[^>]*>.*?<\/li>\n*)+/gs, match => {
+      const isOrdered = match.includes('class="ordered"');
+      const cleanMatch = match.replace(/\n/g, '');
+      return isOrdered ? `<ol>${cleanMatch}</ol>` : `<ul>${cleanMatch}</ul>`;
+    });
+
+    html = html
       .replace(/\n\n/g, '</p><p>')
       .replace(/\n/g, '<br>');
-    html = html.replace(/(<li[^>]*>.*?<\/li>\s*)+/gs, match => `<ul>${match}</ul>`);
     return html;
   }
 
