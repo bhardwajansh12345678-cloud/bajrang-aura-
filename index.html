@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bajrang Aura - Divine AI Assistant</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <div class="divine-bg"></div>
+  <div class="divine-aura-container">
+    <div class="divine-aura aura-1"></div>
+    <div class="divine-aura aura-2"></div>
+    <div class="divine-aura aura-3"></div>
+  </div>
+  <div class="particles" id="particles"></div>
+
+  <header class="divine-header">
+    <div class="header-ornament left"></div>
+    <div class="header-content">
+      <img src="assets/shree-ram.png" alt="Shree Ram" class="deity-img header-deity ram-deity" />
+      <div class="title-section">
+        <h1 class="main-title">Bajrang Aura</h1>
+        <p class="subtitle">Divine Wisdom from Ramayana, Mahabharata & Bhagavad Gita</p>
+      </div>
+      <img src="assets/hanuman.png" alt="Hanuman" class="deity-img header-deity hanuman-deity" />
+    </div>
+    <div class="header-ornament right"></div>
+  </header>
+  <div id="aiStatus" class="ai-status" style="display:none;"></div>
+
+  <div class="main-container">
+    <aside class="deity-sidebar left-sidebar">
+      <div class="deity-card">
+        <img src="assets/shree-ram.png" alt="Shree Ram" class="deity-img sidebar-deity" />
+        <h3>Shree Ram</h3>
+        <p class="deity-desc">Maryada Purushottam, the ideal man who embodied dharma, compassion, and righteousness.</p>
+      </div>
+    </aside>
+
+    <main class="chat-container">
+      <div id="chat-area" class="chat-area" aria-label="chat-area"></div>
+    <div class="shloka-container">
+      <div id="shlokaDisplay" class="shloka-display"></div>
+      <button id="readShloka" class="btn-read" title="Listen to Shloka">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19"/><path d="M19.07 4.93a10 10 0 010 14.14"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg>
+      </button>
+    </div>
+    <div id="webResults" class="web-results" style="display:none;" aria-label="web-results"></div>
+      <div id="listeningIndicator" class="listening-indicator">
+        <div class="listening-dots"><span></span><span></span><span></span></div>
+        <span>Listening...</span>
+      </div>
+      <div class="input-row">
+        <input id="userInput" placeholder="Ask Bajrangi for divine guidance..." />
+        <button id="sendBtn" class="btn-send">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>
+          Send
+        </button>
+        <button id="retryBtn" class="btn-action btn-retry" title="Retry last command">🔄 Retry</button>
+      </div>
+      <div class="controls-row">
+        <div class="lang-selector">
+          <label for="langSwitch">Language:</label>
+          <select id="langSwitch" class="lang-dropdown">
+            <option value="auto">Auto</option>
+            <option value="en">English</option>
+            <option value="hi">Hindi</option>
+          </select>
+        </div>
+        <label class="toggle-listen">
+          <input id="alwaysListen" type="checkbox"/>
+          <span class="toggle-slider"></span>
+          <span class="toggle-label">Always Listening</span>
+        </label>
+        <div class="action-btns">
+          <button id="lifeLessonBtn" class="btn-action btn-gold">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+            Life Lesson
+          </button>
+          <button id="micBtn" class="btn-action btn-mic">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            Mic
+          </button>
+          <button id="stopBtn" class="btn-action btn-stop">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>
+            Stop
+          </button>
+          <button id="settingsBtn" class="btn-action btn-settings">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+            Settings
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <aside class="deity-sidebar right-sidebar">
+      <div class="deity-card">
+        <img src="assets/hanuman.png" alt="Hanuman" class="deity-img sidebar-deity" />
+        <h3>Bajrang Bali</h3>
+        <p class="deity-desc">The mighty devotee of Lord Ram, symbol of strength, devotion, and selfless service.</p>
+      </div>
+    </aside>
+  </div>
+
+  <footer class="divine-footer">
+    <div class="footer-ornament"></div>
+    <p class="footer-text">Jai Shree Ram | Jai Hanuman</p>
+    <div class="footer-ornament"></div>
+  </footer>
+
+  <div id="lifeModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span id="lifeClose" class="close">&times;</span>
+      <div class="modal-header">
+        <img src="assets/hanuman.png" alt="Hanuman" class="modal-deity" />
+        <h3>Divine Guidance</h3>
+      </div>
+      <div class="modal-body">
+        <label for="lifeTopic">Scripture</label>
+        <select id="lifeTopic">
+          <option value="Ramayana">Ramayana</option>
+          <option value="Mahabharata">Mahabharata</option>
+          <option value="Gita">Bhagavad Gita</option>
+        </select>
+        <label for="lifeProblem">Describe your concern</label>
+        <textarea id="lifeProblem" rows="4" placeholder="Describe the situation or feeling you're seeking guidance about."></textarea>
+        <button id="lifeSubmit" type="submit">Get Guidance</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="modal" style="display:none;">
+    <div class="modal-content settings-modal">
+      <span id="settingsClose" class="close">&times;</span>
+      <div class="modal-header">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        <h3>API Configuration</h3>
+      </div>
+      <div class="modal-body">
+        <label for="groqKey">Groq API Key</label>
+        <input type="password" id="groqKey" placeholder="gsk_..." />
+        <label for="hfKey">HuggingFace API Key</label>
+        <input type="password" id="hfKey" placeholder="hf_..." />
+        <label for="tavilyKey">Tavily API Key</label>
+        <input type="password" id="tavilyKey" placeholder="tvly-..." />
+        <div class="settings-actions">
+          <button id="saveSettings" type="button">Save & Apply</button>
+          <button id="testSettings" type="button" class="btn-secondary">Test Keys</button>
+        </div>
+        <div id="settingsStatus" class="settings-status" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Music Player -->
+  <div id="musicPlayer" class="music-player" style="display:none;">
+    <div class="player-header">
+      <div class="player-info">
+        <div class="player-icon">🎵</div>
+        <div>
+          <div class="player-title" id="songTitle">Now Playing</div>
+          <div class="player-status" id="songStatus">Playing music...</div>
+        </div>
+      </div>
+      <button id="closePlayer" class="player-close">&times;</button>
+    </div>
+    <div class="player-controls">
+      <button id="prevBtn" class="player-btn">⏮</button>
+      <button id="playPauseBtn" class="player-btn play-btn">⏸</button>
+      <button id="nextBtn" class="player-btn">⏭</button>
+      <div class="volume-control">
+        <span>🔊</span>
+        <input type="range" id="volumeSlider" min="0" max="100" value="80" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container"></div>
+</body>
+</html>

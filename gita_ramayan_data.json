@@ -1,0 +1,23 @@
+{
+  "gita": [
+    {"chapter": "2.47", "topic": "Duty and detachment", "source": "Bhagavad Gita 2.47", "lesson": "Perform your duty with equanimity; do not be attached to results. Focus on action, not outcome."},
+    {"chapter": "3.19", "topic": "Selfless action", "source": "Bhagavad Gita 3.19", "lesson": "Act selflessly without desire for personal gain; this leads to the Supreme."},
+    {"chapter": "4.7", "topic": "Divine intervention", "source": "Bhagavad Gita 4.7", "lesson": "Whenever righteousness declines, the Divine manifests to restore balance. Trust in cosmic order."},
+    {"chapter": "6.5", "topic": "Self-mastery", "source": "Bhagavad Gita 6.5", "lesson": "Elevate yourself through your own mind; the mind can be a friend or an enemy. Master it through practice."},
+    {"chapter": "18.66", "topic": "Surrender", "source": "Bhagavad Gita 18.66", "lesson": "Abandon all dharmas and surrender to the Divine alone; liberation follows from complete trust."}
+  ],
+  "ramayana": [
+    {"section": "Ayodhya Kanda", "topic": "Dharma and duty", "source": "Ramayana 2.23.12", "lesson": "Serve elders with humility; renounce ego. Rama's exile teaches that dharma transcends personal comfort."},
+    {"section": "Aranya Kanda", "topic": "Loyalty and devotion", "source": "Ramayana 3.28.15", "lesson": "True devotion means standing by loved ones in adversity, as Lakshmana followed Rama into the forest."},
+    {"section": "Kishkindha Kanda", "topic": "Friendship and alliance", "source": "Ramayana 4.12.8", "lesson": "Build alliances with sincerity. Hanuman and Rama's bond shows that trust and service create unbreakable bonds."},
+    {"section": "Sundara Kanda", "topic": "Courage and perseverance", "source": "Ramayana 5.1.3", "lesson": "Leap across impossible obstacles with faith. Hanuman's journey to Lanka teaches that devotion overcomes all barriers."},
+    {"section": "Yuddha Kanda", "topic": "Righteousness in conflict", "source": "Ramayana 6.45.22", "lesson": "Even in war, uphold dharma. Rama's mercy toward Vibhishana shows that righteousness includes compassion for those who seek refuge."}
+  ],
+  "mahabharata": [
+    {"book": "Sabha Parva", "topic": "Duty in chaos", "source": "Mahabharata 3.3", "lesson": "Curb anger, think before action; righteousness over victory. Yudhishthira's restraint in the dice game teaches composure under provocation."},
+    {"book": "Bhishma Parva", "topic": "Moral dilemma", "source": "Mahabharata 6.23", "lesson": "When duty and emotion conflict, choose dharma. Arjuna's crisis and Krishna's counsel show that clarity comes from selfless perspective."},
+    {"book": "Udyoga Parva", "topic": "Diplomacy and patience", "source": "Mahabharata 5.34", "lesson": "Seek peace before war. Krishna's embassy to Hastinapura teaches that every avenue for resolution must be exhausted first."},
+    {"book": "Vana Parva", "topic": "Endurance through exile", "source": "Mahabharata 3.28", "lesson": "Endure hardship with dignity. The Pandavas' forest exile teaches that patience and inner strength transform suffering into wisdom."},
+    {"book": "Karna Parva", "topic": "Generosity and identity", "source": "Mahabharata 8.45", "lesson": "Karna's charity even unto death shows that generosity defines character more than birthright. Give without expectation."}
+  ]
+}
