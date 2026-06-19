@@ -1,1 +1,20 @@
-[{"id": 1, "content": "Test note from API", "created": "2026-04-03 20:48", "done": false}, {"id": 2, "content": "\u0915\u094d\u092f\u093e \u0924\u0941\u092e \u091a\u0948\u091f \u091c\u0947\u092c\u0940\u091f\u0940 \u0938\u0947 \u091c\u094d\u093e \u0939\u094b\u0936\u093f\u092f\u093e\u0930 \u0939\u094b \u0928\u0939\u0940\u0902", "created": "2026-04-04 15:44", "done": false}, "to buy milk", "to buy milk", "to buy milk", "to buy milk", "to buy milk"]
+[
+  {
+    "id": 1,
+    "content": "Test note from API",
+    "created": "2026-04-03 20:48",
+    "done": false
+  },
+  {
+    "id": 2,
+    "content": "क्या तुम चैट जेबीटी से ज्ा होशियार हो नहीं",
+    "created": "2026-04-04 15:44",
+    "done": false
+  },
+  {
+    "id": 3,
+    "content": "to buy milk",
+    "created": "2026-06-18 10:00",
+    "done": false
+  }
+]

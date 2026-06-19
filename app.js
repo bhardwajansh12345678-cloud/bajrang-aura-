@@ -128,6 +128,9 @@
       el.style.display = 'none';
       return;
     }
+    const ollamaOk = data.ollama_status === 'ok';
+    const ollamaEnabled = data.ollama_enabled;
+    const ollamaModel = data.ollama_model || 'N/A';
     const groqKey = data.groq_key === 'set';
     const hfKey = data.hf_key === 'set';
     const tavilyKey = data.tavily_key === 'set';
@@ -136,9 +139,20 @@
     const hfOk = data.hf_status === 'ok';
     const last = data.last_check ? new Date(data.last_check) : null;
     const timeStr = last ? last.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '';
-    const text = `AI status: GROQ ${groqKey ? '(set)' : '(not_set)'} ${groqOk ? '[OK]' : '[ERR]'} | HF ${hfKey ? '(set)' : '(not_set)'} ${hfOk ? '[OK]' : '[ERR]'} | Tavily ${tavilyKey ? '(set)' : '(not_set)'} ${tavilyOk ? '[OK]' : '[ERR]'}${timeStr ? ' • ' + timeStr : ''}`;
+    
+    let ollamaPart = '';
+    if(ollamaEnabled) {
+      ollamaPart = `🦙 Ollama ${ollamaOk ? '✅ Online' : '❌ Offline'} — ${ollamaModel} [PRIMARY]`;
+    } else {
+      ollamaPart = '🦙 Ollama [Disabled]';
+    }
+    
+    const groqLabel = groqOk ? '✅ OK' : (data.groq_key === 'set' ? '⚠️ ERR' : '➖ Not Set');
+    const tavilyLabel = tavilyOk ? '✅ OK' : (data.tavily_key === 'set' ? '⚠️ ERR' : '➖ Not Set');
+    const text = `${ollamaPart} | Groq ${groqLabel} [Fallback] | Tavily ${tavilyLabel}${timeStr ? ' • ' + timeStr : ''}`;
     el.textContent = text;
     el.style.display = 'flex';
+    el.style.background = ollamaOk ? 'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(5,150,105,0.08))' : 'linear-gradient(135deg, rgba(239,68,68,0.15), rgba(220,38,38,0.08))';
   }
   async function fetchAiStatus(){
     try {
@@ -426,7 +440,7 @@
       const data = await res.json();
       return { response: data.response, source: data.source, web_results: data.web_results || [] };
     } catch(e){
-      return { response: 'Error contacting AI backend.', source: 'error', web_results: [] };
+      return { response: '❌ AI backend se connect nahi ho pa raha. Server chala hai? Thodi der baad try karo.', source: 'error', web_results: [] };
     }
   }
 
@@ -450,7 +464,7 @@
       const data = await res.json();
       return data.response;
     } catch(e){
-      return 'Error contacting Life Lesson backend.';
+      return 'Error: Life lesson backend se connect nahi hua.';
     }
   }
 
@@ -473,7 +487,33 @@
     rec.onresult = (e) => {
       const transcript = e.results[e.results.length - 1][0].transcript.trim();
       if (transcript) {
-        handleUserInput(transcript);
+        if (alwaysListening) {
+          const lowerTranscript = transcript.toLowerCase();
+          const wakeWords = ["hi bajrangi", "wake up bajrangi", "bajrangi wake up"];
+          let wokeUp = false;
+          let commandToRun = "";
+          
+          for (let ww of wakeWords) {
+            if (lowerTranscript.includes(ww)) {
+              wokeUp = true;
+              // Extract the command after the wake word, preserving original casing where possible
+              const idx = lowerTranscript.indexOf(ww);
+              commandToRun = transcript.substring(idx + ww.length).trim();
+              break;
+            }
+          }
+          
+          if (wokeUp) {
+            playSound('ping');
+            if (commandToRun) {
+              handleUserInput(commandToRun);
+            } else {
+              handleUserInput(transcript); // send the greeting itself
+            }
+          }
+        } else {
+          handleUserInput(transcript);
+        }
       }
     };
     rec.onend = () => {
@@ -486,7 +526,7 @@
     };
     rec.onerror = (e) => {
       if (e.error === 'not-allowed') {
-        appendErrorMessage('Microphone access denied.');
+        appendErrorMessage('Microphone access nahi mila. Browser settings mein allow karo.');
         alwaysListening = false; isListening = false; updateUI();
       }
     };
@@ -539,7 +579,7 @@
         updateUI();
         stream.getTracks().forEach(track => track.stop());
         
-        appendErrorMessage('Transcribing high-quality audio...', 'info');
+        appendErrorMessage('🎙️ High-quality audio transcribe ho raha hai...', 'info');
         playSound('ping');
         
         const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
@@ -555,14 +595,13 @@
                 console.log("Whisper transcription:", data.text);
                 handleUserInput(data.text);
              } else {
-                appendErrorMessage('Transcription error: ' + (data.error || 'Unknown error. Are API keys set?'));
+                appendErrorMessage('Transcription error: ' + (data.error || 'Unknown error. API keys set hain?'));
              }
           } else {
-             const html = await res.text();
-             appendErrorMessage('Server error. Check backend logs.');
+             appendErrorMessage('Server error. Backend logs check karo.');
           }
         } catch(e) {
-          appendErrorMessage('Error sending audio to server: ' + e.message);
+        appendErrorMessage('Audio send karne mein error: ' + e.message);
         }
       });
       
@@ -571,7 +610,7 @@
       updateUI();
       playSound('ping');
     } catch(err) {
-      appendErrorMessage('Microphone access denied for high-quality audio API.');
+      appendErrorMessage('High-quality audio ke liye microphone access nahi mila.');
     }
   }
 
@@ -661,11 +700,14 @@
       
       // Handle action responses with toasts
       const actionToasts = {
-        'action_open_app': { icon: '🖥️', type: 'success' },
-        'action_play_song': { icon: '🎵', type: 'success' },
-        'action_system_control': { icon: '⚙️', type: 'success' },
+        'action_open_app':      { icon: '🖥️', type: 'success' },
+        'action_play_song':     { icon: '🎵', type: 'success' },
+        'action_system_control':    { icon: '⚙️', type: 'success' },
         'action_system_diagnostic': { icon: '📊', type: 'info' },
-        'action_manage_notes': { icon: '📝', type: 'success' }
+        'action_manage_notes':  { icon: '📝', type: 'success' },
+        'action_multi':         { icon: '⚡', type: 'success' },
+        'action_ollama_tool':   { icon: '🦙', type: 'success' },
+        'action_groq_tool':     { icon: '⚡', type: 'success' },
       };
 
       if(actionToasts[source]){
@@ -675,7 +717,60 @@
         if(!isSilent) isTyping = false;
         return;
       }
-      
+
+      // ── Frontend safety net: catch leaked JSON tool calls from Ollama ──────
+      const TOOL_NAMES = ['play_song_external','open_app','system_control',
+                          'system_diagnostic','manage_notes','get_weather'];
+      function extractLeakedTool(text){
+        if(!text) return null;
+        const cleaned = text.replace(/<\/?tool_call>/g,'').trim();
+        const match = cleaned.match(/(\[?\s*\{[\s\S]*?\}\s*\]?)/);
+        if(!match) return null;
+        try {
+          const obj = JSON.parse(match[1]);
+          const calls = Array.isArray(obj) ? obj : [obj];
+          for(const c of calls){
+            const name = c.name || (c.function && c.function.name) || '';
+            if(TOOL_NAMES.includes(name)) return { name, params: c.parameters || c.arguments || {} };
+          }
+        } catch(e){}
+        return null;
+      }
+      const leakedTool = extractLeakedTool(reply);
+      if(leakedTool){
+        const { name, params } = leakedTool;
+        let toastMsg = '⚙️ Action execute ho raha hai...';
+        let toastIcon = '⚙️';
+        if(name === 'play_song_external'){
+          const song = params.song || params.query || 'Unknown';
+          const platform = (params.platform || 'youtube').toLowerCase();
+          toastMsg = `🎵 "${song}" ${platform} pe play ho raha hai!`;
+          toastIcon = '🎵';
+          const url = platform === 'spotify'
+            ? `https://open.spotify.com/search/${encodeURIComponent(song)}`
+            : `https://www.youtube.com/results?search_query=${encodeURIComponent(song + ' song')}`;
+          window.open(url, '_blank');
+        } else if(name === 'open_app'){
+          const appCmd = params.app_cmd || params.app || '';
+          const appName = params.app_name || appCmd;
+          toastMsg = `🖥️ "${appName}" open ho raha hai!`;
+          toastIcon = '🖥️';
+          fetch('/action', { method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ action_type:'open_app', action_value: appCmd, action_name: appName }) });
+        } else if(name === 'get_weather'){
+          toastMsg = `🌤️ ${params.location || 'location'} ka mausam dekh raha hoon...`;
+          toastIcon = '🌤️';
+        } else {
+          toastMsg = `✅ "${name}" execute ho gaya!`;
+        }
+        playSound('bell');
+        showToast(toastMsg, toastIcon, 'success');
+        if(botWrapper) botWrapper.remove();
+        if(!isSilent) isTyping = false;
+        return;
+      }
+      // ── End safety net ──────────────────────────────────────────────────────
+
       if(!isSilent && botWrapper){
         await streamText(botWrapper, reply);
         if (webResults && webResults.length > 0) renderWebResults(webResults);
@@ -686,7 +781,7 @@
         const contentEl = botWrapper.querySelector('.message-content');
         if(contentEl){
           contentEl.classList.remove('typing-indicator');
-          contentEl.textContent = 'Sorry, I encountered an error. Please try again.';
+          contentEl.textContent = '❌ Kuch error aaya. Dobara try karo. 🙏';
         }
       }
     }
@@ -696,7 +791,7 @@
   function retryLastCommand(){
     console.log('Retry last command called:', { lastUserCommand, isRetrying, retryCount });
     if(!lastUserCommand){
-      appendErrorMessage('No previous command to retry.');
+      appendErrorMessage('Pehle koi command dena hoga retry ke liye.');
       return;
     }
     if(isRetrying){
@@ -704,7 +799,7 @@
       return;
     }
     if(retryCount >= MAX_RETRIES){
-      appendErrorMessage(`Retry limit reached (${MAX_RETRIES} attempts). Please try a different command.`);
+      appendErrorMessage(`Retry limit khatam ho gayi (${MAX_RETRIES} attempts). Koi aur command try karo.`);
       retryCount = 0;
       return;
     }
@@ -718,7 +813,7 @@
       retryBtn.textContent = `⏳ Retrying (${retryCount}/${MAX_RETRIES})...`;
     }
     
-    appendErrorMessage(`🔄 Retry attempt ${retryCount}/${MAX_RETRIES} for: "${lastUserCommand}"`);
+    appendErrorMessage(`🔄 Retry attempt ${retryCount}/${MAX_RETRIES}: "${lastUserCommand}" dobara try kar raha hoon...`);
     
     handleUserInput(lastUserCommand).finally(() => {
       console.log('Retry attempt finished');
@@ -948,6 +1043,37 @@
           document.getElementById('groqKey').value = data.GROQ_API_KEY === 'set' ? '••••••••' : '';
           document.getElementById('hfKey').value = data.HUGGINGFACE_API_KEY === 'set' ? '••••••••' : '';
           document.getElementById('tavilyKey').value = data.TAVILY_API_KEY === 'set' ? '••••••••' : '';
+          
+          // Ollama settings
+          const ollamaToggle = document.getElementById('ollamaEnabled');
+          const ollamaModel = document.getElementById('ollamaModel');
+          const ollamaUrl = document.getElementById('ollamaUrl');
+          if(ollamaToggle) ollamaToggle.checked = data.OLLAMA_ENABLED !== false;
+          if(ollamaUrl) ollamaUrl.value = data.OLLAMA_URL || 'http://localhost:11434';
+          
+          // Load available Ollama models
+          if(ollamaModel){
+            ollamaModel.innerHTML = '';
+            try {
+              const mRes = await fetch('/ollama-models');
+              if(mRes.ok){
+                const mData = await mRes.json();
+                if(mData.models && mData.models.length > 0){
+                  mData.models.forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m; opt.textContent = m;
+                    if(m === data.OLLAMA_MODEL) opt.selected = true;
+                    ollamaModel.appendChild(opt);
+                  });
+                } else {
+                  const opt = document.createElement('option');
+                  opt.value = data.OLLAMA_MODEL || 'llama3.2';
+                  opt.textContent = (data.OLLAMA_MODEL || 'llama3.2') + ' (no models detected)';
+                  ollamaModel.appendChild(opt);
+                }
+              }
+            } catch(e){}
+          }
         }
       } catch(e){}
     });
@@ -966,10 +1092,13 @@
       const groq = document.getElementById('groqKey').value.trim();
       const hf = document.getElementById('hfKey').value.trim();
       const tavily = document.getElementById('tavilyKey').value.trim();
+      const ollamaEnabled = document.getElementById('ollamaEnabled')?.checked ?? true;
+      const ollamaModel = document.getElementById('ollamaModel')?.value || 'llama3.2';
+      const ollamaUrl = document.getElementById('ollamaUrl')?.value || 'http://localhost:11434';
       
       settingsStatus.style.display = 'block';
       settingsStatus.className = 'settings-status loading';
-      settingsStatus.textContent = 'Saving keys...';
+      settingsStatus.textContent = '⏳ Settings save ho rahi hain...';
       
       try {
         const res = await fetch('/config', {
@@ -980,13 +1109,16 @@
             config: {
               GROQ_API_KEY: groq,
               HUGGINGFACE_API_KEY: hf,
-              TAVILY_API_KEY: tavily
+              TAVILY_API_KEY: tavily,
+              OLLAMA_ENABLED: ollamaEnabled,
+              OLLAMA_MODEL: ollamaModel,
+              OLLAMA_URL: ollamaUrl
             }
           })
         });
         if(res.ok){
           settingsStatus.className = 'settings-status success';
-          settingsStatus.textContent = '✓ Keys saved successfully! Restarting server...';
+          settingsStatus.textContent = '✅ Settings save ho gayi! Reload ho raha hai...';
           setTimeout(() => {
             settingsModal.style.display = 'none';
             settingsStatus.style.display = 'none';
@@ -994,11 +1126,11 @@
           }, 1500);
         } else {
           settingsStatus.className = 'settings-status error';
-          settingsStatus.textContent = '✗ Failed to save keys.';
+          settingsStatus.textContent = '❌ Settings save nahi hui. Dobara try karo.';
         }
       } catch(e){
         settingsStatus.className = 'settings-status error';
-        settingsStatus.textContent = '✗ Error saving keys: ' + e.message;
+        settingsStatus.textContent = '❌ Error: ' + e.message;
       }
     });
   }
@@ -1007,23 +1139,24 @@
     testSettings.addEventListener('click', async () => {
       settingsStatus.style.display = 'block';
       settingsStatus.className = 'settings-status loading';
-      settingsStatus.textContent = 'Testing keys...';
+      settingsStatus.textContent = '⏳ Backends test ho rahe hain...';
       
       try {
         const res = await fetch('/ai-status');
         if(res.ok){
           const data = await res.json();
           let msg = '';
-          msg += `Groq: ${data.groq_key === 'set' ? '✓ Set' : '✗ Not set'} (${data.groq_status})\n`;
-          msg += `HF: ${data.hf_key === 'set' ? '✓ Set' : '✗ Not set'} (${data.hf_status})\n`;
-          msg += `Tavily: ${data.tavily_key === 'set' ? '✓ Set' : '✗ Not set'} (${data.tavily_status})`;
-          const allOk = data.groq_status === 'ok' && data.tavily_status === 'ok';
-          settingsStatus.className = allOk ? 'settings-status success' : 'settings-status error';
+          msg += `🦙 Ollama: ${data.ollama_status === 'ok' ? '✅ Online' : '❌ ' + data.ollama_status} (${data.ollama_model}) [PRIMARY]\n`;
+          msg += `Groq: ${data.groq_key === 'set' ? '✅ Set' : '➖ Not set'} — Status: ${data.groq_status} [Fallback 1]\n`;
+          msg += `HuggingFace: ${data.hf_key === 'set' ? '✅ Set' : '➖ Not set'} — Status: ${data.hf_status} [Fallback 2]\n`;
+          msg += `Tavily Search: ${data.tavily_key === 'set' ? '✅ Set' : '➖ Not set'} — Status: ${data.tavily_status}`;
+          const primaryOk = data.ollama_status === 'ok';
+          settingsStatus.className = primaryOk ? 'settings-status success' : 'settings-status error';
           settingsStatus.textContent = msg;
         }
       } catch(e){
         settingsStatus.className = 'settings-status error';
-        settingsStatus.textContent = '✗ Error testing keys: ' + e.message;
+        settingsStatus.textContent = '❌ Testing mein error: ' + e.message;
       }
     });
   }

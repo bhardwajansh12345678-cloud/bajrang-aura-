@@ -138,18 +138,50 @@
       <span id="settingsClose" class="close">&times;</span>
       <div class="modal-header">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-        <h3>API Configuration</h3>
+        <h3>AI Backend Configuration</h3>
       </div>
       <div class="modal-body">
-        <label for="groqKey">Groq API Key</label>
-        <input type="password" id="groqKey" placeholder="gsk_..." />
-        <label for="hfKey">HuggingFace API Key</label>
-        <input type="password" id="hfKey" placeholder="hf_..." />
-        <label for="tavilyKey">Tavily API Key</label>
-        <input type="password" id="tavilyKey" placeholder="tvly-..." />
+        <!-- Ollama (Primary) -->
+        <div class="settings-section ollama-section">
+          <div class="section-header">
+            <span class="section-badge primary-badge">PRIMARY</span>
+            <span class="section-title">🦙 Ollama (Local AI)</span>
+          </div>
+          <div class="ollama-row">
+            <label class="toggle-listen ollama-toggle">
+              <input id="ollamaEnabled" type="checkbox" checked />
+              <span class="toggle-slider"></span>
+              <span class="toggle-label">Enable Ollama</span>
+            </label>
+          </div>
+          <label for="ollamaModel">Model</label>
+          <select id="ollamaModel" class="settings-select">
+            <option value="llama3.2">llama3.2</option>
+          </select>
+          <label for="ollamaUrl">Ollama URL</label>
+          <input type="text" id="ollamaUrl" placeholder="http://localhost:11434" value="http://localhost:11434" />
+          <p class="settings-hint">No API key needed. Runs 100% locally on your machine.</p>
+        </div>
+
+        <div class="settings-divider"></div>
+
+        <!-- Cloud Fallbacks -->
+        <div class="settings-section">
+          <div class="section-header">
+            <span class="section-badge fallback-badge">FALLBACK</span>
+            <span class="section-title">☁️ Cloud APIs</span>
+          </div>
+          <label for="groqKey">Groq API Key</label>
+          <input type="password" id="groqKey" placeholder="gsk_..." />
+          <label for="hfKey">HuggingFace API Key</label>
+          <input type="password" id="hfKey" placeholder="hf_..." />
+          <label for="tavilyKey">Tavily API Key</label>
+          <input type="password" id="tavilyKey" placeholder="tvly-..." />
+        </div>
+
         <div class="settings-actions">
-          <button id="saveSettings" type="button">Save & Apply</button>
-          <button id="testSettings" type="button" class="btn-secondary">Test Keys</button>
+          <button id="saveSettings" type="button">Save &amp; Apply</button>
+          <button id="testSettings" type="button" class="btn-secondary">Test Backends</button>
         </div>
         <div id="settingsStatus" class="settings-status" style="display:none;"></div>
       </div>
